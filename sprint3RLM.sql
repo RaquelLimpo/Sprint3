@@ -10,7 +10,7 @@ id VARCHAR(20) NOT NULL UNIQUE PRIMARY KEY,
 iban VARCHAR(50) NOT NULL,
 pan VARCHAR(50) NOT NULL,
 pin VARCHAR(4) NOT NULL,
-cvv SMALLINT NOT NULL,
+cvv INT NOT NULL,
 expiring_date VARCHAR(20) NOT NULL,
 current_date DATE
 );
@@ -74,6 +74,40 @@ SELECT *
 FROM transactions.VistaMarketing
 WHERE Pais_Residencia = 'Germany';
 
+#                                      ********Nivell 3********
+
+# **Exercici 1**
+#Modifiquem les taules perque coincideixin amb la imatge.
+
+#user: canviar nom a data_user, canvia email a personal_email
+ALTER TABLE user RENAME  to data_user;
+ALTER TABLE user RENAME COLUMN email to personal_email;
+
+#company: esborrar columna website
+ALTER TABLE company DROP COLUMN website;
+
+#credit_card: afegir columna fecha_actual DATE, esborrar pan
+ALTER TABLE  credit_card ADD COLUMN fecha_actual DATE;
+ALTER TABLE credit_card DROP COLUMN pan;
+
+# **Exercici 2**
+CREATE VIEW transactions.InformeTecnico AS
+SELECT 
+t.id AS ID_Transaccio,
+u.first_name AS Nom_Usuari,
+u.last_name AS Cognom_Usuari,
+cc.iban AS IBAN_Targeta,
+c.company_name AS Nom_Companyia
+FROM 
+transactions.transaction AS t
+JOIN 
+transactions.user AS u ON t.user_id = u.id
+JOIN 
+transactions.credit_card AS cc ON t.credit_card_id = cc.id
+JOIN 
+transactions.company AS c ON t.company_id = c.id
+ORDER BY 
+ID_Transaccio DESC;
 
 
 
