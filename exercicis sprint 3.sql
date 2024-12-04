@@ -6,27 +6,26 @@
 #Després de crear la taula serà necessari que ingressis la informació del document denominat "dades_introduir_credit". 
 #Recorda mostrar el diagrama i realitzar una breu descripció d'aquest.
 CREATE TABLE IF NOT EXISTS credit_card (
-id VARCHAR(20) UNIQUE PRIMARY KEY,
-iban VARCHAR(50) NOT NULL,
-pan VARCHAR(50) NOT NULL,
-pin VARCHAR(4) NOT NULL,
-cvv SMALLINT NOT NULL,
-expiring_date VARCHAR(20) NOT NULL,
-current_date DATE
-);
-
+	id VARCHAR(20) PRIMARY KEY,
+	iban VARCHAR(50) NOT NULL,
+	pan VARCHAR(50) NOT NULL,
+	pin VARCHAR(4) NOT NULL,
+	cvv INT NOT NULL,
+	expiring_date VARCHAR(20) NOT NULL
+    );
+    
 CREATE INDEX credit_card_id_idx
 	ON transaction(credit_card_id);
-ALTER TABLE credit_card
-	ADD FOREIGN KEY (id) REFERENCES transaction (credit_card_id);
-
-ALTER TABLE transaction
-	ADD FOREIGN KEY (credit_card_id) REFERENCES credit_card (id),
-    ADD FOREIGN KEY (user_id) REFERENCES user (id);
     
+ALTER TABLE transaction
+	ADD FOREIGN KEY (credit_card_id) REFERENCES credit_card (id);
+    
+#Afegim dades manualment i les comprovem 
+SELECT * FROM transactions.credit_card;
+
 # **Exercici2**
 #El departament de Recursos Humans ha identificat un error en el número de compte de l'usuari amb ID CcU-2938. La informació que ha de mostrar-se per a aquest registre és: R323456312213576817699999.
-# Recorda mostrar que el canvi es va realitzar.
+# Recorda mostrar que el canvi es va realitzar
 UPDATE credit_card
 SET iban= 'R323456312213576817699999'
 WHERE id = 'CcU-2938';
@@ -38,6 +37,15 @@ WHERE id = 'CcU-2938';
 
 # **Exercici 3**
 #En la taula "transaction" ingressa un nou usuari
+INSERT INTO credit_card(
+id,
+iban,
+pan,
+pin,
+cvv,
+expiring_date
+)
+VALUES ('CcU-9999','0','0','0','0','0');
 
 SELECT * 
 FROM credit_card 
@@ -48,13 +56,6 @@ VALUES ('b-9999');
 
 SELECT * 
 FROM company 
-WHERE id = 'b-9999';
-
-INSERT INTO user (id) 
-VALUES ('b-9999');
-
-SELECT * 
-FROM user
 WHERE id = 'b-9999';
 
 INSERT INTO transaction (
@@ -129,10 +130,32 @@ WHERE Pais_Residencia = 'Germany';
 
 # **Exercici 1**
 #Modifiquem les taules perque coincideixin amb la imatge.
+#Crear taula user
+
+CREATE INDEX idx_user_id ON transaction(user_id);
+
+CREATE TABLE IF NOT EXISTS user (
+        id INT PRIMARY KEY,
+        name VARCHAR(100),
+        surname VARCHAR(100),
+        phone VARCHAR(150),
+        email VARCHAR(150),
+        birth_date VARCHAR(100),
+        country VARCHAR(150),
+        city VARCHAR(150),
+        postal_code VARCHAR(100),
+        address VARCHAR(255)    
+    );
+    
+ALTER TABLE transaction
+ADD FOREIGN KEY (user_id) REFERENCES data_user (id);
+#comprovem la taula 
+
+SELECT * FROM transactions.user;
 
 #user: canviar nom a data_user, canvia email a personal_email
 ALTER TABLE user RENAME  to data_user;
-ALTER TABLE user RENAME COLUMN email to personal_email;
+ALTER TABLE data_user RENAME COLUMN email to personal_email;
 
 #company: esborrar columna website
 ALTER TABLE company DROP COLUMN website;
@@ -140,27 +163,21 @@ ALTER TABLE company DROP COLUMN website;
 #credit_card: afegir columna fecha_actual DATE
 ALTER TABLE  credit_card ADD COLUMN fecha_actual DATE;
 
-
 # **Exercici 2**
 CREATE VIEW transactions.InformeTecnico AS
 SELECT 
 t.id AS ID_Transaccio,
-u.first_name AS Nom_Usuari,
-u.last_name AS Cognom_Usuari,
+u.name AS Nom_Usuari,
+u.surname AS Cognom_Usuari,
 cc.iban AS IBAN_Targeta,
 c.company_name AS Nom_Companyia
 FROM 
 transactions.transaction AS t
 JOIN 
-transactions.user AS u ON t.user_id = u.id
+transactions.data_user AS u ON t.user_id = u.id
 JOIN 
 transactions.credit_card AS cc ON t.credit_card_id = cc.id
 JOIN 
 transactions.company AS c ON t.company_id = c.id
 ORDER BY 
 ID_Transaccio DESC;
-
-
-
-
-
