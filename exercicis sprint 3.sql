@@ -147,10 +147,12 @@ CREATE TABLE IF NOT EXISTS user (
         address VARCHAR(255)    
     );
     
+SET foreign_key_checks = 0; 
 ALTER TABLE transaction
-ADD FOREIGN KEY (user_id) REFERENCES data_user (id);
-#comprovem la taula 
+ADD FOREIGN KEY (user_id) REFERENCES user (id);
+SET foreign_key_checks = 1; 
 
+#comprovem la taula 
 SELECT * FROM transactions.user;
 
 #user: canviar nom a data_user, canvia email a personal_email
